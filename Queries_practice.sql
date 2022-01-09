@@ -246,11 +246,6 @@ lag(Total_marks) over(partition by student_name order by student_name) as previo
 from student) temp
 where temp.Total_Marks>temp.previous
 
-
-
---4(not solved my me)
-
-
 --5
 select distinct product_id, temp.co 
 from (
@@ -300,18 +295,11 @@ select PRODUCT_ID,
 from Order_Tbl
 group by PRODUCT_ID
 
---7
---explode the above data into single unit level records as shown below
-
---8
-
 --9
 --team matches
 select distinct  concat(a.teamname,' Vs ' ,b.teamname) as matches from team a 
 cross join team b
 where a.id < b.id 
-
---10
 
 --11
 with matches as(
@@ -333,18 +321,12 @@ dense_rank()over(partition by accountnumber order by transactiontime desc) as rn
 from Transaction_Table) temp
 where temp.rn = 1
 
---13
 
 --14 cumulative sum 
-
 select *,
 sum(quantity)over(partition by productcode order by inventorydate) as running_total
 from inventory;
 
---15 print english alphabets 
-
---16 prime number
---17
 --18 net balance
 
 select TranDate,TranType,Amount,
@@ -404,9 +386,7 @@ max(dates) as end_date
 from temp2
 group by balance,total
 
---22 
-
---23(not solved)
+--23
 select distinct
 case when start_location > end_location  then end_location else start_location end as source,
 case when start_location > end_location  then start_location else end_location end as dest,
@@ -416,3 +396,64 @@ from dbo.Travel_Table
 Select Start_Location,End_Location,Distance from (
 Select Start_Location,End_Location,Distance,row_number() over(Partition by Distance order by Distance) as Row_Num 
 from Travel_Table) A where Row_Num = 1
+
+
+--40 
+with temp as (
+select distinct e.SerialNo, e.Name, m.Month_ID as id, m.[Month]  
+from Emp_Table e, Month_Table m)
+
+select t.SerialNo, t.Name, t.[Month],emp.amount from temp t
+left join Emp_Table emp
+on emp.Month_ID = t.id and emp.SerialNo =t.SerialNo
+
+
+--Nth Highest Salary in SQL| How to find 2nd Highest Salary in SQL| SQL Interview Question
+select * from (
+select *, dense_rank()over(order by salary desc) as dk
+from employee
+)temp
+where temp.dk =1
+
+
+--43
+--fetch Alternate Records from the Table
+--even number records
+
+with temp as (
+select *,
+row_number()over(order by id) as rn
+from students2
+)
+select * from temp 
+where rn%2 = 0
+
+--odd number
+with temp as (
+select *,
+row_number()over(order by id) as rn
+from students2
+)
+select * from temp 
+where rn%2 != 0
+
+--
+with temp as (
+select loc_name, loc_id, cus_id, amount_paid, app,
+count(app)over(partition by loc_name, app order by amount_paid) as dk
+from Transaction_Tbls ta
+inner join customer cu
+on ta.cus_id = cu.customer_id
+),
+temp2 as (
+select app, amount_paid, dk,
+dense_rank()oveR(order by amount_paid desc)as dk2
+from temp
+where dk in (0,2) 
+)
+select upper(left(isnull(app,'Offline'),1))+lower(SUBSTRING(isnull(app,'Offline'),2,LEN(isnull(app,'Offline')))) as app_mode, 
+		dk2 as count from temp2
+where dk2<=2
+order by dk2 desc
+
+
