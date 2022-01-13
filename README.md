@@ -1,1 +1,1 @@
-# SQL-Code
+# SQL Query Practice
