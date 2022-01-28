@@ -109,5 +109,37 @@ from doctors dr, doctors ds
 where dr.id <> ds.id
 and dr.hospital = ds.hospital
 
+*************************
+--Amazon DE
+*************************
+
+--sold on both days
+--number of time sold
+with temp as (
+select *, dense_rank()over(partition by product_id order by  order_id) as dk,
+count(ORDER_id)over(partition by product_id) as co
+from DEMOSALES
+)
+select distinct product_id, Co 
+from temp
+where temp.dk>=2 
+
+--2
+
+select distinct PRODUCT_ID from DEMOSALES
+where product_id not in (select product_id from DEMOSALES where ORDER_DAY = '2011-01-07')
+
+--3
+select order_day,PRODUCT_ID,so  from(
+select *, dense_rank()over(partition by order_day order by so desc) as dk from(
+select order_day,PRODUCT_ID,sum(qty*price)over(partition by order_day, product_id) as so
+from DEMOSALES) temp) temp2
+where dk=1
+
+--4
+select distinct order_day, product_id from (
+select *, count(product_id)over(partition by order_day, product_id ) as dk from DEMOSALES
+) temp
+where dk>=2
 
 
