@@ -56,3 +56,12 @@ from employee em
 join department dm
 on em.departmentid=dm.id) temp
 where temp.ro <= 3;
+
+
+--Exchange Seats
+
+select id,
+case when id%2!=0 then lead(student,1,student)over(order by id)
+    when id%2 = 0 then lag(student)over(order by id)
+end as student
+from seat
