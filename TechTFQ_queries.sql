@@ -74,3 +74,92 @@ select id, city, temperature, day from temp
 where flag =  'true'
 
 --8 write a SQL query to get the histogram of specialties of the unique physicians who have done the procedures but never did prescribe anything
+
+select * from EVENT_CATEGORY;
+select * from PHYSICIAN_SPECIALITY;
+select * from PATIENT_TREATMENT;
+
+with temp as (
+select pt.patient_id, pt.event_name, pt.physician_id, ps.speciality, ec.category
+from PATIENT_TREATMENT pt
+join PHYSICIAN_SPECIALITY ps
+on pt.physician_id = ps.physician_id
+inner join EVENT_CATEGORY ec
+on pt.event_name = ec.event_name
+),temp2 as(
+select distinct *,
+row_number()over(order by speciality)
+from temp
+)
+
+select distinct speciality, count(speciality)
+from temp2 
+group by speciality
+
+--9 top 2 accounts with the maximum number of unique patients on a monthly basis
+
+select a.month, a.account_id, a.no_of_unique_patients
+from (
+		select x.month, x.account_id, no_of_unique_patients,
+			row_number() over (partition by x.month order by x.no_of_unique_patients desc) as rn
+		from (
+				select pl.month, pl.account_id, count(1) as no_of_unique_patients
+				from (select distinct to_char(date,'month') as month, account_id, patient_id
+						from patient_logs) pl
+				group by pl.month, pl.account_id) x
+     ) a
+where a.rn < 3
+
+--10 Concecutive records
+
+--have primary key
+with temp as (
+	select *,
+	row_number()over(order by id) as rn,
+	id - row_number()over(order by id) as diff
+	from weather2
+	where temperature<0
+	),
+temp2 as (
+	select *,
+	count(diff)over(partition by diff) as co
+	from temp)
+
+select * from temp2
+where co = 4
+
+--when we have no primary key
+
+with wea as (
+	select row_number()over() as id, *
+	from v_weather),
+temp as (
+	select *,
+	row_number()over(order by id) as rn,
+	id - row_number()over(order by id) as diff
+	from wea
+	where temperature<0
+	),
+temp2 as (
+	select *,
+	count(diff)over(partition by diff) as co
+	from temp)
+
+select * from temp2
+where co = 4
+
+
+--Based on only date field
+with temp as(
+	select *,
+	row_number()over(order by order_id)  as rn,
+	order_date-(cast(row_number()over(order by order_id) as int)) as diff
+	from orders
+),
+temp2 as (
+select *, count(diff)over(partition by diff) as co
+from temp)
+select * from temp2
+where co = 3
+
+
