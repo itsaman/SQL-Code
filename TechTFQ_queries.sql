@@ -162,4 +162,68 @@ from temp)
 select * from temp2
 where co = 3
 
+-----------------------------------------------------------------------------------
+--Cherry Academy 
+--10 SQL interview Query
+
+--1 Find duplicate records
+select empname, count(salary)
+from cemployee
+group by empname
+having count(salary)>=2
+
+--2 delete the duplicate records
+with temp as (
+	select *,
+	row_number()over(partition by empname,salary) as rn
+	from cemployee
+)
+delete from temp 
+where rn>1
+
+
+--3 find manager name for the employee
+
+select e1.empname as employee_name, e2.empname as managername
+from cemployee e1
+join cemployee e2
+on e1.managerid = e2.empid
+
+--4/5/6 Second heighest salary and employee and nthe salary
+with temp as (
+select *,
+dense_rank()over(order by salary desc) as dk
+from cemployee
+)
+select * from temp 
+where dk = 2
+
+--7 find max salary from each dept
+
+select * from(
+	select *,
+	dense_rank()over(partition by e1.deptid order by salary desc) as dk
+	from cemployee e1
+	inner join cdepartment d
+	on e1.deptid = d.deptid
+) temp 
+where dk =1
+
+--9 Showing single row twice in a result set
+
+select empid, empname,deptid, salary from cemployee where deptid = 1
+union all 
+select empid, empname,deptid, salary from cemployee where deptid = 1
+
+--10 dept less than 3 employees
+select deptname from 
+cdepartment where deptid in(
+	select deptid from (
+		select *,
+			   count(empname)over(partition by deptid) as co 
+		from cemployee) temp 
+		where co<3
+)
+
+
 
