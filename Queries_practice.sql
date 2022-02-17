@@ -749,3 +749,14 @@ select upper(left(isnull(app,'Offline'),1))+lower(SUBSTRING(isnull(app,'Offline'
 where dk2<=2
 order by dk2 desc
 
+
+--44
+
+with temp as (
+select *,
+lag(createdat)over(partition by userid order by createdat),
+createdat-lag(createdat)over(partition by userid order by createdat) as diff
+from Transactions_Amazon
+)
+select distinct userid from temp
+where diff<=7
