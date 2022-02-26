@@ -18,7 +18,7 @@ union all
 select emp_id, 'hike' as salary_component_type, hike as val from emp_compensation_pivot
 order by emp_id
 
---Derive Points table for ICC tournament
+--complex query --1 || Derive Points table for ICC tournament
 
 with temp as (
 	select team_1 as team_name, case when team_1 = winner then 1 else 0 end as win_flag
@@ -32,7 +32,7 @@ from temp
 group by team_name
 order by matches desc
 
--- Repeated customers
+-- complex query -2 || Repeated customers
 --new customer
 with temp as (
 select customer_id, min(order_date) as first_date
@@ -73,15 +73,35 @@ from joined_table
 group by order_date 
 order by order_date
 
+--complez queries - 3 
+
+with temp as (
+select *,count(floor) over(partition by name) as total_visits, 
+count(floor)over(partition by floor,name) as floor_count
+from entries
+), temp2 as (
+select *, dense_rank()over(partition by name order by floor_count desc) as dk
+from temp
+), temp3 as(
+select distinct name, resources,floor, total_visits, dk
+from temp2
+), temp4 as (
+select name,floor, total_visits,string_agg(resources, ',')over(partition by name) as resources, dk
+from temp3
+)
+select name, floor, total_visits, resources from temp4
+where dk =1 
 
 --complex query - 10
 
 with temp as (
-	select *, row_number()over(order by date_value), (date_part('day', date_value) - row_number()over(order by date_value)) as diff
+	select *, row_number()over(order by date_value), (
+		   date_part('day', date_value) - row_number()over(order by date_value)) as diff
 	from tasks
 	where state = 'success'
 ), temp2 as (
-select *, row_number()over(order by date_value), (date_part('day', date_value) - row_number()over(order by date_value)) as diff
+select *, row_number()over(order by date_value), 
+	   (date_part('day', date_value) - row_number()over(order by date_value)) as diff
 	from tasks
 	where state = 'fail'
 ), res as (
@@ -89,8 +109,39 @@ select * from temp
 union all 
 select * from temp2
 )
-select distinct min(date_value)over(partition by diff) as start_date, max(date_value)over(partition by diff) as end_date, state
+select distinct min(date_value)over(partition by diff) as start_date, 
+				max(date_value)over(partition by diff) as end_date, 
+				state
 from res 
+
+
+--complex query - 9||Market Analysis2 
+
+with temp as (
+select *, count(order_date)over(partition by seller_id) as co, 
+	dense_rank()over(partition by seller_id order by order_date) as dk
+from users urs
+left join orders ord
+on ord.seller_id = urs.user_id
+left join items itm
+on ord.item_id = itm.item_id
+),temp2 as (
+select *, 
+case when co >= 2 and dk = 2 and favorite_brand = item_brand then 'yes'
+	 when co<2 then 'no'
+else 'no'
+end as status
+from temp
+)
+select distinct user_id as seller_id, order_date, favorite_brand, item_brand, status
+from temp2
+where dk =2 or co<2
+order by user_id 
+
+--
+
+
+
 
 
 
