@@ -33,6 +33,20 @@ Select id,movie,description,rating from cinema
 where id %2 != 0 and description != 'boring'
 order by rating desc
 
+--Nth Heighest Salary
+CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+BEGIN
+  RETURN (
+      # Write your MySQL query statement below     
+     with temp as (
+      select *, dense_rank() over(order by salary desc) as rn from Employee  
+     )  
+    
+      select distinct temp.salary from temp
+      where temp.rn = N
+  );
+END
+
 --Swap Salary
 update Salary 
 set sex = (case when sex = 'f' then 'm' else 'f' end)
