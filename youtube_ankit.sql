@@ -92,6 +92,8 @@ from temp3
 select name, floor, total_visits, resources from temp4
 where dk =1 
 
+
+
 --complex query - 10
 
 with temp as (
@@ -138,8 +140,42 @@ from temp2
 where dk =2 or co<2
 order by user_id 
 
---
+-- Game play Analysis ---
 
+select * from activity
+
+--first login date 
+with temp as (
+select *, dense_rank()over(partition by player_id order by event_date) as dk 
+from activity
+)
+select * from temp 
+where dk = 1
+
+--2
+with temp as (
+select *, row_number()over(partition by player_id order by device_id) as dk 
+from activity
+)
+select * from temp 
+where dk = 1 
+
+--3
+select player_id, event_date, sum(games_played)over(partition by player_id order by event_date)
+from activity
+
+--4
+with temp as (
+select *, 
+lag(event_date)over(partition by player_id order by event_date) as l1,
+event_date - lag(event_date)over(partition by player_id order by event_date) as diff
+from activity
+)
+select round(count(diff)/count(*),2) as fraction
+from temp 
+where diff = 1 
+
+--
 
 
 
