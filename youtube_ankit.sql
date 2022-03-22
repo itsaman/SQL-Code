@@ -175,6 +175,63 @@ select round(count(diff)/count(*),2) as fraction
 from temp 
 where diff = 1 
 
+--Full outer Join
+with temp as (
+select e1.emp_id as old_id, e2.emp_id as new_id, e1.designation as old_Desi, e2.designation as new_desi from emp_2020 e1
+full join emp_2021 e2
+on e1.emp_id = e2.emp_id
+), temp2 as (
+select coalesce(old_id,new_id) as id, 
+	case when new_desi is null then 'Resigned'
+		 when old_Desi is null then 'New Joiner'
+		 when old_Desi != new_desi then 'Promoted'
+		 else  'Null'
+	end as Comments
+from temp
+)
+select * from temp2 
+where comments != 'Null'
+
+--Second Most Recent Activity (NM)
+with temp as(
+select *,count(1)over(partition by username) as co,
+row_number()over(partition by username order by enddate) as rn
+from UserActivity
+)
+select * from temp 
+where co = 1 or rn = 2
+
+--SCD 2 implementation(NM)
+
+select * from billings;
+select * from HoursWorked;
+
+with date_range as (
+select *, 
+lead(DATE(bill_date - INTERVAL '1 DAY'),1,'9999-12-31')over(partition by emp_name order by bill_date) as bill_end_date
+from billings
+)
+select dr.emp_name, sum(bill_rate*bill_hrs)
+from date_range dr
+inner join HoursWorked hw
+on dr.emp_name = hw.emp_name and hw.work_date between dr.bill_date and dr.bill_end_date
+group by dr.emp_name
+
+
+--Calculate Mode in SQL
+
+with temp as (
+select *, count(id)over(partition by id)  as co from mode
+)
+select distinct id from temp 
+where co = (select max(co) from temp)
+
+with temp as (
+select id, count(id) as co from mode
+group by id )
+select distinct id from temp 
+where co = (select max(co) from temp)
+
 --
 
 
