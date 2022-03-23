@@ -232,7 +232,34 @@ group by id )
 select distinct id from temp 
 where co = (select max(co) from temp)
 
---
+
+--Amazon Prime Subscription Rate SQL
+with temp as (
+select e.user_id, name, join_date, type, access_date, count(name)over(partition by type) as co
+from users2 u
+inner join events e on u.user_id = e.user_id
+where type = 'Music'
+),
+temp2 as (
+select u.user_id, count(u.user_id)over() as co2
+from users2 u
+inner join events e on u.user_id = e.user_id
+where (access_date - join_date) < 30 and type = 'P'
+)
+select  temp2.co2,temp.co, (temp2.co2*100/ temp.co)
+from temp
+join temp2 on temp.user_id = temp2.user_id
+
+
+--Recommendation System(NM)
+
+select concat(p2.name,' ',p1.name) as pair, count(1) as purchase_freq
+from orders2 o1
+join orders2 o2
+on o1.order_id = o2.order_id and o1.product_id > o2.product_id
+inner join products p1 on p1.id = o1.product_id 
+inner join products p2 on p2.id = o2.product_id 
+group by  p1.name, p2.name
 
 
 
