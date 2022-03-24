@@ -262,6 +262,19 @@ inner join products p2 on p2.id = o2.product_id
 group by  p1.name, p2.name
 
 
-
+--Rank the duplicate records
+ 
+with temp1 as (
+	select id, count(1) as co from list group by id having count(1) > 1
+),
+temp2 as (
+	select id, count(1) as co from list group by id having count(1) = 1
+)
+select id, concat('DUP',dense_rank()over(order by id)) from list
+where id in (select id from temp1)
+union all 
+select id, case when co = 1 then 'NULL' end as res from temp2
+where co = 1
+order by id 
 
 
