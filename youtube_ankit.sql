@@ -277,4 +277,41 @@ select id, case when co = 1 then 'NULL' end as res from temp2
 where co = 1
 order by id 
 
+--Consecutive Empty Seats
 
+--M1 Row_number
+with temp as (
+select seat_no,is_empty, (seat_no-row_number()over()) as rn from bms
+where is_empty = 'Y'
+), temp2 as(
+select seat_no,is_empty, count(rn)over(partition by rn) as rn2
+from temp 
+)
+select seat_no from temp2
+where rn2>=3
+
+--M2 lag/lead
+
+with temp as (
+select *,
+lag(is_empty,1)over(order by seat_no) as prev_1,
+lag(is_empty,2)over(order by seat_no) as prev_2,
+lead(is_empty,1)over(order by seat_no) as next_1,
+lead(is_empty,2)over(order by seat_no) as next_2
+from bms
+)
+select * from temp
+where is_empty = 'Y' and prev_1 = 'Y' and prev_2 = 'Y'
+or is_empty = 'Y' and next_1 = 'Y' and next_2 = 'Y'
+or is_empty = 'Y' and next_1 = 'Y' and prev_1 = 'Y'
+
+
+--Deadly Combination
+with temp as (
+select *,
+count(student_id)over(partition by student_id) as co,
+lag(marks)over(partition by student_id order by subject) as lg1
+from exams
+)
+select * from temp
+where co=2 and marks = lg1
