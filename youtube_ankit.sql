@@ -307,6 +307,7 @@ or is_empty = 'Y' and next_1 = 'Y' and prev_1 = 'Y'
 
 
 --Deadly Combination
+--M1
 with temp as (
 select *,
 count(student_id)over(partition by student_id) as co,
@@ -315,3 +316,12 @@ from exams
 )
 select * from temp
 where co=2 and marks = lg1
+
+--M2
+--using group by 
+select student_id
+from exams
+where subject in ('Chemistry', 'Physics')
+group by student_id
+having count(subject) =2 and count(distinct marks) =1
+
