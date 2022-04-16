@@ -325,3 +325,13 @@ where subject in ('Chemistry', 'Physics')
 group by student_id
 having count(subject) =2 and count(distinct marks) =1
 
+
+--Beauty of SQL RANK Function
+with temp as (
+select *, cases - lag(cases)over(partition by city order by days) as lg1
+from covid
+)
+select distinct city from temp where city not in ( 
+select city from temp 
+where lg1<0
+)
