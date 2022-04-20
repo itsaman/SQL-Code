@@ -335,3 +335,15 @@ select distinct city from temp where city not in (
 select city from temp 
 where lg1<0
 )
+
+
+----Google SQL Interview Question
+with temp as (
+select *, 
+row_number()over(partition by company_id, user_id order by language) as rn from company_users
+where language not in ('Spanish')
+)
+select company_id, count(*) from temp
+where rn = 2
+group by company_id
+having count(*)>=2
