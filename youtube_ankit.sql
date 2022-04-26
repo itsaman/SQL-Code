@@ -347,3 +347,17 @@ select company_id, count(*) from temp
 where rn = 2
 group by company_id
 having count(*)>=2
+
+--Meesho SQL questsion
+
+with temp as (
+select *, budget-cost as diff 
+from products2, customer_budget
+where cost<budget
+)
+select customer_id,budget,count(*), STRING_AGG(product_id,',') as products
+from temp
+where diff>= cost
+group by customer_id,budget
+order by customer_id
+
