@@ -361,3 +361,16 @@ where diff>= cost
 group by customer_id,budget
 order by customer_id
 
+
+----Horizontal Sorting in SQL (NBM)
+with temp as(
+select sms_date,
+case when sender<receiver then sender else receiver end as p1,
+case when sender>receiver then sender else receiver end as p2,
+sms_no
+from subscriber
+)
+select p1, p2, sum(sms_no)
+from temp
+group by p1, p2
+
