@@ -163,4 +163,4 @@ from ActorDirector
 select distinct actor_id, director_id from temp 
 where dk>=3
 
---
+-
