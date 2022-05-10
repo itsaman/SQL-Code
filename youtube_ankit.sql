@@ -416,4 +416,9 @@ dense_rank()over(partition by subject order by marks asc) as low
 from students) temp
 group by subject
 
-
+--4
+select *, case when marks>lg then 'inc' else 'dec' end as status
+from (
+select *,
+lag(marks)over(partition by studentid order by studentid, subject) as lg
+from students) temp
