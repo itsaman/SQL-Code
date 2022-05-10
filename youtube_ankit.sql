@@ -374,3 +374,11 @@ select p1, p2, sum(sms_no)
 from temp
 group by p1, p2
 
+--1
+-- student scored above the avg marks in each subject
+with temp as (
+select *, avg(marks)over(partition by subject) as avg_marks from students
+)
+select * from temp
+where marks>avg_marks
+
