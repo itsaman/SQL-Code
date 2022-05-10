@@ -382,3 +382,38 @@ select *, avg(marks)over(partition by subject) as avg_marks from students
 select * from temp
 where marks>avg_marks
 
+--2 
+with temp as(
+select count(distinct studentname) as co from students
+where marks>90
+)
+select co*100/(select count(distinct studentname) from students)
+from temp 
+
+--3 second heighest and second lowest for each subjects
+
+with t1 as(
+select * from (
+select subject,marks, dense_rank()over(partition by subject order by marks desc) as heigh
+from students) temp where heigh = 2 
+), t2 as (
+select * from (
+select subject, marks,dense_rank()over(partition by subject order by marks asc) as low 
+from students) temp where low =2
+)
+select t1.subject, t1.marks as second_heighest, t2.marks as second_lowest
+from t1
+inner join t2
+on t1.subject = t2.subject 
+
+--better query
+
+select subject, sum(case when heigh = 2 then marks else null end) as second_heighest,
+sum(case when low =2 then marks else null end) as second_lowest
+from(
+select subject, marks, dense_rank()over(partition by subject order by marks desc) as heigh,
+dense_rank()over(partition by subject order by marks asc) as low 
+from students) temp
+group by subject
+
+
