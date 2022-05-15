@@ -422,3 +422,15 @@ from (
 select *,
 lag(marks)over(partition by studentid order by studentid, subject) as lg
 from students) temp
+
+-- Count Occurrence of a Character
+--1 count spaces
+
+select name, replace(name,' ',''), 
+length(name)-length(replace(name,' ','')) as cnt
+from strings
+
+--2
+select name, replace(name,'Ak',''), 
+(length(name)-length(replace(name,'Ak','')))/length('Ak') as cnt
+from strings
