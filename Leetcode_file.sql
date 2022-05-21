@@ -164,3 +164,12 @@ select distinct actor_id, director_id from temp
 where dk>=3
 
 --Tree Node
+   select distinct t1.id, 
+    case when t1.p_id is null then 'Root'
+         when t1.id = t2.p_id and t1.id is not null then 'Inner'
+         when t2.id is null and t2.p_id is null then 'Leaf'
+    end as 'type'
+   from tree t1
+   left join tree t2
+   on t1.id = t2.p_id
+   order by t1.id
