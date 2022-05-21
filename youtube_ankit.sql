@@ -434,3 +434,13 @@ from strings
 select name, replace(name,'Ak',''), 
 (length(name)-length(replace(name,'Ak','')))/length('Ak') as cnt
 from strings
+
+----Brilliant SQL Interview Question 
+--no Subquery, WF, CTE
+--NBM
+select t1.order_number, t1.order_date,t1.salesperson_id,t1.amount
+from int_orders t1
+left join int_orders t2
+on t1.salesperson_id=t2.salesperson_id 
+group by t1.order_number,t1.order_date,t1.cust_id,t1.salesperson_id,t1.amount
+having t1.amount>=max(t2.amount)
