@@ -444,3 +444,19 @@ left join int_orders t2
 on t1.salesperson_id=t2.salesperson_id 
 group by t1.order_number,t1.order_date,t1.cust_id,t1.salesperson_id,t1.amount
 having t1.amount>=max(t2.amount)
+
+---SQL ON OFF Problem
+--NBM
+
+with temp2 as (
+select *,
+sum(case when status = 'on' and lg = 'off' then 1 else 0 end)over(order by event_time) as group_key
+from( 
+select *,
+lag(status, 1, status)over(order by event_time) as lg
+from event_status)temp
+)
+select 
+min(event_time) as login_time, max(event_time) as log_out, count(1)-1 as cnt
+from temp2 
+group by group_key
