@@ -22,3 +22,20 @@ else 'other'
 end as business_type
 from sf_restaurant_health_violations
 
+
+--Customer Revenue In March
+select cust_id,
+sum(total_order_cost) as revenue
+from orders
+where date_part('month',order_date) = 3
+group by cust_id
+order by revenue desc
+
+
+--Finding User Purchases
+select distinct a.user_id
+from amazon_transactions a
+left join amazon_transactions b
+on a.user_id = b.user_id
+where a.id>b.id
+and abs(datediff(a.created_at, b.created_at))<=7
