@@ -460,3 +460,17 @@ select
 min(event_time) as login_time, max(event_time) as log_out, count(1)-1 as cnt
 from temp2 
 group by group_key
+
+
+--Students Reports By Geography 
+--NBM
+select player_group,
+min(case when city = 'Mumbai' then name else null end) as Mumbai,
+min(case when city = 'Delhi' then name else null end )as Delhi,
+min(case when city = 'Bangalore' then name else null end) as Bangalore
+from(select *,
+row_number()over(partition by city order by name asc) as player_group
+from players_location) temp 
+group by player_group 
+order by player_group
+
