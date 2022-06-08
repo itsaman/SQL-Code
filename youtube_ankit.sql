@@ -474,3 +474,19 @@ from players_location) temp
 group by player_group 
 order by player_group
 
+
+-- Most Asked SQL Problem with a Twist
+with temp as(
+select *, dense_rank()over(partition by dep_name order by salary desc) as dk,
+count(*)over(partition by dep_name) as co
+from emp
+), temp2 as(
+select *, dense_rank()over(partition by dep_name order by salary asc) as dk2 from temp
+where co<3
+)
+select emp_id, emp_name, salary, dep_id, dep_name from temp 
+where dk =3
+union
+select emp_id, emp_name, salary, dep_id, dep_name from temp2
+where dk2 = 1
+
