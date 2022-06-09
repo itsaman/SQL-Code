@@ -760,3 +760,13 @@ from Transactions_Amazon
 )
 select distinct userid from temp
 where diff<=7
+
+
+--total amount recevied by each merchant via cash or online mode
+
+select merchant,
+SUM(case when payment_mode = 'CASH' then amount else 0 end) as "cash_payment",
+SUM(case when payment_mode = 'ONLINE' then amount else 0 end) as "online_payment"
+from payments_data
+GROUP BY merchant
+
