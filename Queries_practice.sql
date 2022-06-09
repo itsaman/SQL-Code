@@ -762,6 +762,24 @@ select distinct userid from temp
 where diff<=7
 
 
+
+--49 Number of Calls between two Persons
+--NBM
+
+with temp as(
+select
+case when from_id<to_id then from_id else to_id end as person_1,
+case when from_id>to_id then from_id else to_id end as person_2,
+duration
+from calls
+)
+select distinct person_1, person_2, 
+count(person_1)over(partition by person_1,person_2),
+sum(duration)over(partition by person_1,person_2)
+from temp;
+
+
+
 --total amount recevied by each merchant via cash or online mode
 
 select merchant,
