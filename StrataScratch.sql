@@ -80,3 +80,24 @@ from sf_restaurant_health_violations
 where business_name = 'Roxanne Cafe' 
 and violation_id is not null;
 
+
+--Host Popularity Rental Prices
+with temp as(
+    select distinct
+    concat(price, room_type, host_since, zipcode, number_of_reviews) as host_id,
+        number_of_reviews,
+        price
+    from airbnb_host_searches
+), temp2 as(
+select price,
+case when number_of_reviews = 0 then 'New'
+    when number_of_reviews between 1 and 5 then 'Rising'
+    when number_of_reviews between 6 and 15 then 'Trending Up'
+    when number_of_reviews between 16 and 40 then 'Popular'
+     WHEN number_of_reviews > 40 THEN 'Hot'
+end as "popularity_rating"
+from temp 
+)
+select popularity_rating, min(price), avg(price), max(price)
+from temp2
+group by popularity_rating
