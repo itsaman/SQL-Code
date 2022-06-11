@@ -63,4 +63,11 @@ where dk = 1
 order by worker_title
 
 
-
+--Highest Target Under Manager
+with temp as (
+select first_name, target 
+from salesforce_employees
+where manager_id = 13 
+)
+select * from temp 
+where target = (select max(target) from temp )
