@@ -71,3 +71,12 @@ where manager_id = 13
 )
 select * from temp 
 where target = (select max(target) from temp )
+
+
+--Number of violations
+select distinct extract(year from inspection_date), 
+        count(*)over(partition by extract(year from inspection_date))
+from sf_restaurant_health_violations
+where business_name = 'Roxanne Cafe' 
+and violation_id is not null;
+
