@@ -808,3 +808,24 @@ stu s
 join friend f
 on s.id = f.id
 where f.salary2>s.salary1;
+
+
+--Sorting with one value at top 
+
+with temp as (
+select * from country
+where countryname = 'India'
+), temp2 as (
+select * from country 
+where countryname not in(select countryname from temp)
+order by countryname
+)
+select * from temp
+union all 
+select * from temp2
+
+or
+
+select * from country 
+order by case when countryname = 'India' then 0 else 1 end, countryname
+
