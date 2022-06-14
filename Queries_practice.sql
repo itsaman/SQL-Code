@@ -788,3 +788,23 @@ SUM(case when payment_mode = 'ONLINE' then amount else 0 end) as "online_payment
 from payments_data
 GROUP BY merchant
 
+
+--50 best friend higher salary than student
+
+with stu as (
+select st.id, st.student_name, pt.salary as salary1 from 
+students_tbl st
+join package_tbl pt
+on st.id = pt.id
+),
+friend as (
+select ft.id, ft.friend_id, pt.salary as salary2 from 
+Friends_Tbl ft
+join package_tbl pt
+on ft.friend_id = pt.id
+)
+select s.student_name from 
+stu s 
+join friend f
+on s.id = f.id
+where f.salary2>s.salary1;
