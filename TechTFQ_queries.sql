@@ -226,4 +226,33 @@ cdepartment where deptid in(
 )
 
 
+--Home Assignment
+
+--1 Calculate the average rating given by students to each teacher for each session created. 
+--  Also, provide the batch name for which session was conducted.
+
+select att.session_id,se.conducted_by,ba.name, avg(att.rating) as avg_rating
+from attendances att
+inner join sessions se
+on att.session_id = se.id
+inner join batches ba
+on se.batch_id = ba.id
+group by att.session_id, se.conducted_by,ba.name 
+order by session_id;
+
+--2 Find the attendance percentage for each session for each batch.
+--  Also mention the batch name and users name who has conduct that session
+
+select  se.id, se.batch_id,ba.name,urs.name, count(att.student_id)*100/(select count(*) from attendances) as attendance_perc
+from attendances att
+inner join student_batch_maps sbm
+on att.student_id = sbm.id
+inner join batches ba
+on sbm.batch_id = ba.id
+inner join sessions se
+on se.batch_id = ba.id
+left join users urs
+on se.conducted_by = urs.id
+group by se.id, se.batch_id,ba.name,urs.name
+order by se.id
 
