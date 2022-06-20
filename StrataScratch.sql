@@ -121,3 +121,24 @@ WHERE user_id in
                concat((user_id),'_', (product_id)) AS user_product
         FROM marketing_campaign) x
      WHERE rn = 1 )
+     
+     --Premium vs Freemium
+     
+     
+with temp as(
+select date,
+sum(case when paying_customer = 'no' then downloads end) as s1,
+sum(case when paying_customer = 'yes' then downloads end) as s2
+from ms_acc_dimension acc
+inner join ms_user_dimension usr
+on acc.acc_id = usr.acc_id
+inner join ms_download_facts dow
+on usr.user_id = dow.user_id
+group by date
+order by date
+)
+select t.date, s1 as non_paying, s2 as paying
+from temp t 
+where s1>s2
+
+
