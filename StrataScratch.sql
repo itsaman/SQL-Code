@@ -141,4 +141,9 @@ select t.date, s1 as non_paying, s2 as paying
 from temp t 
 where s1>s2
 
-
+--Reviews of Categories
+--NBM
+select unnest(string_to_array(categories,';')), sum(review_count) as total
+from yelp_business
+group by unnest(string_to_array(categories,';'))
+order by total desc
