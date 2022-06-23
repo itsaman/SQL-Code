@@ -490,3 +490,15 @@ union
 select emp_id, emp_name, salary, dep_id, dep_name from temp2
 where dk2 = 1
 
+
+--SQL Interview Question Asked by Udaan
+
+with temp as(
+select *,
+dense_rank()over(partition by city_id order by extract(year from business_date)) as rn
+from business_city
+)
+select extract(year from business_date) as year, count(1) from temp
+where rn = 1 
+group by extract(year from business_date)
+
