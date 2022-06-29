@@ -126,16 +126,16 @@ WHERE user_id in
      
      
 with temp as(
-select date,
-sum(case when paying_customer = 'no' then downloads end) as s1,
-sum(case when paying_customer = 'yes' then downloads end) as s2
-from ms_acc_dimension acc
-inner join ms_user_dimension usr
-on acc.acc_id = usr.acc_id
-inner join ms_download_facts dow
-on usr.user_id = dow.user_id
-group by date
-order by date
+     select date,
+            sum(case when paying_customer = 'no' then downloads end) as s1,
+            sum(case when paying_customer = 'yes' then downloads end) as s2
+     from ms_acc_dimension acc
+     inner join ms_user_dimension usr   
+     on acc.acc_id = usr.acc_id
+     inner join ms_download_facts dow
+     on usr.user_id = dow.user_id
+     group by date
+     order by date
 )
 select t.date, s1 as non_paying, s2 as paying
 from temp t 
@@ -158,9 +158,30 @@ where e1.salary>e2.salary
 
 --Highest Salary In Department
 with temp as(
-select *, dense_rank()over(partition by department order by salary desc) as dk from employee
+     select *, dense_rank()over(partition by department order by salary desc) as dk from employee
 )
 select department,first_name, salary
 from temp
 where dk =1 
 order by salary desc;
+
+
+--Acceptance Rate By Date
+with temp as (
+     select *, count(user_id_sender)over(partition by user_id_sender) as rn
+     from fb_friend_requests
+), temp2 as (
+     select date, count(*) as co from(
+          select user_id_sender, min(date) as date, rn from temp
+          where rn = 2
+          group by user_id_sender, rn) t
+     group by date
+), total as (
+     select date, count(*) as total from temp
+     where action = 'sent'
+     group by date
+)
+select t.date, t2.co::decimal/t.total::decimal
+from total t
+join temp2 t2
+on t.date = t2.date
