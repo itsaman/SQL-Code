@@ -155,3 +155,12 @@ from employee e1
 join employee e2
 on e1.manager_id = e2.id
 where e1.salary>e2.salary
+
+--Highest Salary In Department
+with temp as(
+select *, dense_rank()over(partition by department order by salary desc) as dk from employee
+)
+select department,first_name, salary
+from temp
+where dk =1 
+order by salary desc;
