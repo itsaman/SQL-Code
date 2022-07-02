@@ -502,3 +502,15 @@ select extract(year from business_date) as year, count(1) from temp
 where rn = 1 
 group by extract(year from business_date)
 
+
+--PharmEasy SQL| Consecutive Seats in a Movie Theatre
+--NBM
+
+with temp as (
+select *,
+case when occupancy = 1 then 1 else 2 end as rn2,
+row_number()over(partition by left(seat,1))  as rn
+from movie)
+
+select seat,occupancy, (rn2-occupancy) from temp
+
