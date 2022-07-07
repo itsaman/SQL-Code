@@ -506,11 +506,17 @@ group by extract(year from business_date)
 --PharmEasy SQL| Consecutive Seats in a Movie Theatre
 --NBM
 
-with temp as (
-select *,
-case when occupancy = 1 then 1 else 2 end as rn2,
-row_number()over(partition by left(seat,1))  as rn
-from movie)
+with temp1 as(
+select *, left(seat,1) as row_id, cast(substring(seat,2,2) as int) as seat_id from movie
+), temp2 as (
+select *, 
+max(occupancy) over(partition by row_id order by seat_id rows between current row and 3 following) as status,
+count(occupancy) over(partition by row_id order by seat_id rows between current row and 3 following) as cnt
+from temp1
+), temp3 as (
+select * from temp2 where status = 0 and cnt = 4
+)
+select temp2.* from temp2 inner join temp3 on temp2.row_id = temp3.row_id and temp2.seat_id between temp3.seat_id and temp3.seat_id+3
 
-select seat,occupancy, (rn2-occupancy) from temp
+
 
