@@ -536,3 +536,16 @@ select distinct call_type, call_number,sum_no, lag(sum_no)over(partition by call
 )
 select distinct * from temp2
 where sum_no>inc_no and call_type != 'SMS'
+
+
+--2 approach
+with temp as(
+select call_number,
+sum(case when call_type = 'INC' then call_duration else 0 end) as inc_dur,
+sum(case when call_type = 'OUT' then call_duration else 0 end) as out_dur
+from call_details
+group by call_number
+)
+select * from temp
+where inc_dur !=0 and out_dur !=0 and inc_dur<out_dur
+
