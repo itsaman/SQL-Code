@@ -558,3 +558,20 @@ group by call_number
 Having sum(case when call_type = 'INC' then call_duration else 0 end)>0  and
 sum(case when call_type = 'OUT' then call_duration else 0 end)>0 and 
 sum(case when call_type = 'OUT' then call_duration else 0 end) > sum(case when call_type = 'INC' then call_duration else 0 end);
+
+--#4 Approach
+with temp1 as(
+select call_number, sum(call_duration) as out_dur
+from call_details
+where call_type = 'OUT'
+group by call_number
+),temp2 as(
+select call_number, sum(call_duration) as inc_dur
+from call_details
+where call_type = 'INC'
+group by call_number
+)
+select temp1.call_number 
+from temp1
+inner join temp2 on temp1.call_number  = temp2.call_number and  out_dur>inc_dur
+
