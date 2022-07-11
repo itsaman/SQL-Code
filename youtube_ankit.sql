@@ -519,4 +519,20 @@ select * from temp2 where status = 0 and cnt = 4
 select temp2.* from temp2 inner join temp3 on temp2.row_id = temp3.row_id and temp2.seat_id between temp3.seat_id and temp3.seat_id+3
 
 
+--Bosch Scenario Based SQL
 
+with temp as(
+select *, sum(call_duration)over(partition by call_number, call_type) as sum_no from call_details
+where call_number in(
+	select call_number from call_details
+	where call_type ='INC'
+	INTERSECT
+	select call_number from call_details
+	where call_type ='OUT'
+)
+), temp2 as(
+select distinct call_type, call_number,sum_no, lag(sum_no)over(partition by call_number) as inc_no  
+	from temp
+)
+select distinct * from temp2
+where sum_no>inc_no and call_type != 'SMS'
