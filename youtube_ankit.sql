@@ -549,3 +549,12 @@ group by call_number
 select * from temp
 where inc_dur !=0 and out_dur !=0 and inc_dur<out_dur
 
+--#3 Approach
+select call_number,
+sum(case when call_type = 'INC' then call_duration else 0 end) as inc_dur,
+sum(case when call_type = 'OUT' then call_duration else 0 end) as out_dur
+from call_details
+group by call_number
+Having sum(case when call_type = 'INC' then call_duration else 0 end)>0  and
+sum(case when call_type = 'OUT' then call_duration else 0 end)>0 and 
+sum(case when call_type = 'OUT' then call_duration else 0 end) > sum(case when call_type = 'INC' then call_duration else 0 end);
