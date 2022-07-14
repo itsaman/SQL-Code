@@ -575,3 +575,19 @@ select temp1.call_number
 from temp1
 inner join temp2 on temp1.call_number  = temp2.call_number and  out_dur>inc_dur
 
+---###Last Not Null Value###
+--NBM
+
+with temp1 as(
+select *,
+row_number()over(order by (select null)) as rn
+from brands
+), temp2 as(
+select *, lead(rn,1,100)over(order by rn) as rn2 from temp1
+where category is not null 
+)
+select temp2.category, temp1.brand_name
+from temp1 
+inner join temp2 on temp1.rn >= temp2.rn and temp1.rn <= temp2.rn2
+
+
