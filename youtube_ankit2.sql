@@ -58,3 +58,17 @@ with t1 as (
 select emp_id,experience,salary from t2 
 union 
 select emp_id,experience,salary from t4
+
+--2 Approach:
+with t1 as (
+	select *, sum(salary)over(order by salary asc) as s1 from candidates
+), t2 as (
+	select * from t1
+	where s1 < 70000 and experience = 'Senior'
+), t3 as(
+	select * from t1
+	where experience = 'Junior' and  s1 <= (70000 - (select sum(salary) from t2))
+)
+select emp_id,experience,salary from t2 
+union 
+select emp_id,experience,salary from t3
