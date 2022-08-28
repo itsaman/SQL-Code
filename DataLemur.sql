@@ -48,3 +48,13 @@ from temp
 LIMIT 3
 
 ---- ***Histogram of Tweets***
+with temp as(
+  SELECT user_id, count(1) as co FROM tweets
+  where extract(year from tweet_date) = 2022
+  group by user_id
+  )
+select 
+  co as tweet_bucket,
+  count(user_id)
+from temp
+group by co
