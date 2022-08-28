@@ -35,3 +35,14 @@ group by sender_id
 order by co desc
 limit 2
 
+--Highest Number of Products
+with temp as (
+  SELECT user_id, sum(spend) as total , count(product_id) as co
+  from user_transactions
+  group by user_id
+  having sum(spend) >= 1000
+  order by co desc, total desc
+)
+select user_id, co as product_num
+from temp
+LIMIT 3
