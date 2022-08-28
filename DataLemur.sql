@@ -14,3 +14,9 @@ left join page_likes pl
 on p.page_id = pl.page_id
 where liked_date is NULL
 order by p.page_id
+
+--Laptop vs Mobile Viewership
+SELECT 
+sum(case when device_type ='laptop' then 1 else 0 end) as "laptop_views",
+sum(case when device_type = 'tablet' or device_type = 'phone' then 1 else 0 end) as "mobile_views"
+FROM viewership
