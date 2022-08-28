@@ -7,3 +7,10 @@ where status = 'Completed'
 group by u.city
 order by total_orders desc
 limit 3
+
+--Page With No Likes
+SELECT p.page_id FROM pages p
+left join page_likes pl
+on p.page_id = pl.page_id
+where liked_date is NULL
+order by p.page_id
