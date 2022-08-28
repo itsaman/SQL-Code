@@ -26,3 +26,12 @@ SELECT order_date,product_type,
 sum(quantity)over(partition by product_type order by order_date) as cum_purchased
 FROM total_trans
 order by order_date
+
+--Teams Power Users
+SELECT sender_id, count(message_id) as co
+FROM messages
+where extract(month from sent_date) = 8 and  EXTRACT(YEAR FROM sent_date) = '2022'
+group by sender_id
+order by co desc
+limit 2
+
