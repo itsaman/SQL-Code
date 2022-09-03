@@ -81,3 +81,12 @@ FROM purchases
 )
 select count(distinct user_id) from temp
 where user_id not in(select distinct user_id from temp where rn >=2)
+
+--Duplicate Job Listings
+select count(distinct company_id) from 
+(
+select company_id, title, description, count(*)
+from job_listings jl
+group by company_id, title, description
+having count(*)>1
+) temp
