@@ -73,3 +73,11 @@ from (
 join datacenters dc
 on temp.datacenter_id = dc.datacenter_id
 order by datacenter_id
+
+--Repeat Purchases on Multiple Days
+WITH temp as (
+SELECT *, count(user_id)over(partition by DATE(purchase_date),user_id) as rn
+FROM purchases
+)
+select count(distinct user_id) from temp
+where user_id not in(select distinct user_id from temp where rn >=2)
