@@ -58,3 +58,18 @@ select
   count(user_id)
 from temp
 group by co
+
+
+--- Spare Server Capacity
+
+select dc.datacenter_id, dc.monthly_capacity - temp.total 
+from (
+  SELECT datacenter_id, sum(monthly_demand) as total
+  FROM customers cu
+  join forecasted_demand jd
+  on cu.customer_id = jd.customer_id
+  group by datacenter_id
+) temp 
+join datacenters dc
+on temp.datacenter_id = dc.datacenter_id
+order by datacenter_id
