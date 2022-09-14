@@ -90,3 +90,28 @@ from job_listings jl
 group by company_id, title, description
 having count(*)>1
 ) temp
+
+
+--Average Post Hiatus (Part 1)
+with temp as(
+  select user_id, count(1) as co
+  from posts
+  where EXTRACT(year from post_date) = '2021'
+  group by user_id 
+  having count(1)>1
+), temp2 as(
+  select *,
+  dense_rank()over(partition by user_id order by post_date) as first
+  from posts
+  where user_id in (select user_id from temp)
+), temp3 as (
+  select *,
+  dense_rank()over(partition by user_id order by post_date desc) as last
+  from posts
+  where user_id in (select user_id from temp)
+)
+select t1.user_id, date_part('day', t2.post_date-t1.post_date)
+from temp2 t1
+inner join temp3 t2
+on t1.user_id = t2.user_id
+where t1.first = 1 and t2.last = 1
