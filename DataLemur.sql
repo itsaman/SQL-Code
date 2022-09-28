@@ -115,3 +115,16 @@ from temp2 t1
 inner join temp3 t2
 on t1.user_id = t2.user_id
 where t1.first = 1 and t2.last = 1
+
+---**Data Science Skills**-----
+
+with temp as(
+select candidate_id from candidates
+where skill in ('Python', 'Tableau', 'PostgreSQL')
+)
+select candidate_id from (
+select candidate_id, count(1) as co from temp
+group by candidate_id
+having count(1)>=3
+)temp2
+
