@@ -137,3 +137,15 @@ FROM transactions
 select user_id, spend, transaction_date 
 from temp
 where rn = 3 
+
+--Compensation Outliers
+with temp as(
+SELECT *,AVG(salary)over(partition by title) as avg_sal,
+  case when salary > 2* (AVG(salary)over(partition by title)) then 'Overpaid'   
+       when salary < (AVG(salary)over(partition by title))/2 then 'Underpaid' 
+end as status
+FROM employee_pay
+)
+select employee_id,salary,status from temp
+where status is not null
+order by employee_id
