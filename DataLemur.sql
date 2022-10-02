@@ -128,3 +128,12 @@ group by candidate_id
 having count(1)>=3
 )temp2
 
+---User's Third Transaction---
+
+with temp as(
+SELECT user_id, spend, transaction_date, dense_rank()over(partition by user_id order by transaction_date) as rn
+FROM transactions
+)
+select user_id, spend, transaction_date 
+from temp
+where rn = 3 
