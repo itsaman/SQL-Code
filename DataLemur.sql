@@ -149,3 +149,23 @@ FROM employee_pay
 select employee_id,salary,status from temp
 where status is not null
 order by employee_id
+
+
+--***Sending vs. Opening Snaps***----
+
+with temp as(
+    SELECT age_bucket,
+    sum(case when activity_type = 'open' then time_spent else 0 end) as "open",
+    sum(case when activity_type = 'send' then time_spent else 0 end) as "send",
+    sum(time_spent) as total
+    FROM activities act
+    join age_breakdown age
+    on act.user_id = age.user_id
+    where activity_type in ('send','open')
+    group by age_bucket
+)
+select  age_bucket, 
+        ROUND((send/total)*100.0,2) as send_per, 
+        ROUND((open/total)*100.0,2) as open_per  
+from temp
+
