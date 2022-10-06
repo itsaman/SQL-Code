@@ -169,3 +169,16 @@ select  age_bucket,
         ROUND((open/total)*100.0,2) as open_per  
 from temp
 
+
+----Odd and Even Measurements
+with temp as (
+  SELECT *, 
+  row_number()over(partition by EXTRACT(DAY from measurement_time) order by measurement_time::timestamp::time) as rn
+  FROM measurements
+)
+select DATE(measurement_time) as measurement_day, 
+sum(case when rn%2 !=0 then measurement_value else 0 end) as "odd_sum",
+sum(case when rn%2 = 0 then measurement_value else 0 end) as "even_sum"
+from temp
+group by DATE(measurement_time)
+order by DATE(measurement_time) 
