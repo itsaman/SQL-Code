@@ -182,3 +182,28 @@ sum(case when rn%2 = 0 then measurement_value else 0 end) as "even_sum"
 from temp
 group by DATE(measurement_time)
 order by DATE(measurement_time) 
+
+
+---*** Frequently Purchased Pairs ***----
+
+with CTE_TEMP as(
+SELECT 
+      tr.transaction_id, 
+      tr.product_id, 
+      tr.user_id,
+      pr.product_name
+FROM transactions tr
+join products pr
+on tr.product_id = pr.product_id
+)
+select t1.product_name as product1, 
+       t2.product_name as product2, 
+       count(1) as combo_num 
+from CTE_TEMP t1
+join CTE_TEMP t2 
+on t1.transaction_id = t2.transaction_id 
+and t1.product_id > t2.product_id
+GROUP BY t1.product_name , t2.product_name
+order by combo_num desc
+limit 3
+
