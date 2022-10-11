@@ -207,6 +207,7 @@ GROUP BY t1.product_name , t2.product_name
 order by combo_num desc
 limit 3
 
+
 --Highest-Grossing Items
 with temp as(
   SELECT distinct category, product, sum(spend)over(partition by category,product) as total
@@ -218,3 +219,13 @@ with temp as(
 )
 select category, product, total from temp2 
 where dk <=2;
+
+
+---First Transaction
+
+with temp as(
+select *, dense_rank()over(partition by user_id order by transaction_date) as dk
+from user_transactions
+)
+select count(distinct user_id) from temp
+where dk = 1 and spend>=50
