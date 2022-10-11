@@ -207,3 +207,14 @@ GROUP BY t1.product_name , t2.product_name
 order by combo_num desc
 limit 3
 
+--Highest-Grossing Items
+with temp as(
+  SELECT distinct category, product, sum(spend)over(partition by category,product) as total
+  FROM product_spend
+  where EXTRACT(Year from transaction_date) = '2022'
+), temp2 as(
+  select *, dense_rank()over(PARTITION BY category order by total desc) as dk
+  from temp
+)
+select category, product, total from temp2 
+where dk <=2;
