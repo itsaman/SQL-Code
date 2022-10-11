@@ -229,3 +229,20 @@ from user_transactions
 )
 select count(distinct user_id) from temp
 where dk = 1 and spend>=50
+
+
+--LinkedIn Power Creators (Part 2)
+
+with temp as(
+  SELECT pp.profile_id,pp.name,pp.followers,ec.company_id, cp.name, cp.followers,
+  case when pp.followers>cp.followers then 1 else 0 end as "filter"
+  from personal_profiles pp
+  join  employee_company ec
+  on pp.profile_id = ec.personal_profile_id
+  inner join company_pages cp
+  on ec.company_id = cp.company_id
+  )
+select distinct profile_id from temp where profile_id not in(
+select distinct profile_id from temp where filter= 0
+)
+order by profile_id
