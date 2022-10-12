@@ -246,3 +246,17 @@ select distinct profile_id from temp where profile_id not in(
 select distinct profile_id from temp where filter= 0
 )
 order by profile_id
+
+
+--User Shopping Sprees
+with temp as(
+  SELECT *,
+  EXTRACT(DAY FROM transaction_date)-row_number()over(partition by user_id order by transaction_date) as rn
+  FROM transactions
+), temp2 as(
+  select user_id, rn, count(1)
+  from temp
+  group by  user_id, rn
+  having count(1)>=3
+)
+select distinct user_id from temp2
