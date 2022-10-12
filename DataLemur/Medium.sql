@@ -130,3 +130,15 @@ with temp as(
   having count(1)>=3
 )
 select distinct user_id from temp2
+
+--Photoshop Revenue Analysis
+with temp as(
+  SELECT *
+  FROM adobe_transactions
+  where customer_id in (select customer_id from adobe_transactions where product = 'Photoshop')
+)
+select customer_id, sum(revenue) 
+from temp 
+where product != 'Photoshop'
+group by customer_id
+order by customer_id
