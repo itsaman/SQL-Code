@@ -138,3 +138,10 @@ FROM transactions
 select  account_id , sum(new_amount) as final_balance
 from temp
 group by account_id
+
+--Average Review Ratings
+
+SELECT EXTRACT(Month from submit_date),  product_id, ROUND(avg(stars),2) 
+FROM reviews
+group by EXTRACT(Month from submit_date),  product_id
+order by EXTRACT(Month from submit_date),  product_id
