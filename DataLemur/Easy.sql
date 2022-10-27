@@ -128,4 +128,13 @@ group by candidate_id
 having count(1)>=3
 )temp2
 
+--Final Account Balance
 
+with temp as(
+SELECT *,
+case when transaction_type = 'Withdrawal' then amount*-1 else amount end as new_amount
+FROM transactions
+)
+select  account_id , sum(new_amount) as final_balance
+from temp
+group by account_id
