@@ -72,3 +72,16 @@ with t1 as (
 select emp_id,experience,salary from t2 
 union 
 select emp_id,experience,salary from t3
+
+--2023
+--Interview Question Asked in a Startup
+with t1 as (
+	select *, row_number()over() as rn from call_start_logs
+	),
+	t2 as (
+		select *, row_number()over() as rn from call_end_logs
+	)
+select t1.phone_number, t1.start_time, t2.end_time, Extract(epoch from (end_time-start_time))/60 as diff  
+from t1
+join t2 on t1.rn = t2.rn 
+
