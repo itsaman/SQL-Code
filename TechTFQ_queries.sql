@@ -256,3 +256,10 @@ on se.conducted_by = urs.id
 group by se.id, se.batch_id,ba.name,urs.name
 order by se.id
 
+--Hierarchical data in SQL
+With RECURSIVE TEMP1 AS (
+	select emp_id, emp_id as employee_id from hierdata
+	UNION ALL
+	select t1.emp_id, h.emp_id from temp1 t1 join hierdata h on t1.employee_id = h.reporting_id
+)
+select * from temp1 order by emp_id, employee_id;
