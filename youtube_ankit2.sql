@@ -85,3 +85,28 @@ select t1.phone_number, t1.start_time, t2.end_time, Extract(epoch from (end_time
 from t1
 join t2 on t1.rn = t2.rn 
 
+
+-------Case Study by A Major Travel Company
+
+select * from booking_table;
+
+select * from user_table;
+
+
+--1 
+with t1 as (
+select segment, count(1) as total_user 
+from user_table
+group by segment
+), t2 as (
+select ut.segment, count(distinct bt.user_id) as booked_flight 
+	from booking_table bt 	
+	join user_table ut
+	on bt.user_id = ut.user_id
+	where bt.line_of_business = 'Flight' 
+	and bt.booking_date between '2022-04-01' and '2022-04-30'
+	group by ut.segment
+)
+select t1.segment, t1.total_user, t2.booked_flight
+from t1 join t2 on t1.segment = t2.segment
+order by t1.segment;
