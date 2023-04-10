@@ -86,27 +86,33 @@ from t1
 join t2 on t1.rn = t2.rn 
 
 
--------Case Study by A Major Travel Company
-
-select * from booking_table;
-
-select * from user_table;
-
+-------Case Study by A Major Travel Company-----------
 
 --1 
 with t1 as (
-select segment, count(1) as total_user 
-from user_table
+	--total no of users
+select segment, count(1) as total_user from user_table
 group by segment
 ), t2 as (
-select ut.segment, count(distinct bt.user_id) as booked_flight 
-	from booking_table bt 	
-	join user_table ut
-	on bt.user_id = ut.user_id
-	where bt.line_of_business = 'Flight' 
-	and bt.booking_date between '2022-04-01' and '2022-04-30'
-	group by ut.segment
+	-- no of flights booked
+select ut.segment, count(distinct bt.user_id) as booked_flight from booking_table bt 
+left join user_table ut
+on bt.user_id = ut.user_id
+where bt.line_of_business = 'Flight' 
+and bt.booking_date between '2022-04-01' and '2022-04-30'
+group by ut.segment
 )
 select t1.segment, t1.total_user, t2.booked_flight
 from t1 join t2 on t1.segment = t2.segment
 order by t1.segment;
+
+
+--2 
+
+with temp as(
+select *, dense_rank()over(partition by bt.user_id order by booking_date) as dk
+from booking_table bt 
+)
+select * from temp
+where dk = 1 and line_of_business = 'Hotel';
+
