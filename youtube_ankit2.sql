@@ -122,3 +122,14 @@ select user_id, max(booking_date), min(booking_date), (max(booking_date)- min(bo
 from booking_table
 group by user_id;
 
+
+--4 
+
+select segment, 
+sum((case when bt.line_of_business = 'Flight' then 1 else 0 end)) as flights,
+sum((case when bt.line_of_business = 'Hotel' then 1 else 0 end)) as hotel 
+from booking_table bt
+join user_table ut
+on ut.user_id = bt.user_id
+where EXTRACT('Year' FROM bt.booking_date) = '2022' 
+group by segment;
