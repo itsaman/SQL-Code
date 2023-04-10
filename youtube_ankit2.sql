@@ -116,3 +116,9 @@ from booking_table bt
 select * from temp
 where dk = 1 and line_of_business = 'Hotel';
 
+--3 days b/w first booking and last booking 
+
+select user_id, max(booking_date), min(booking_date), (max(booking_date)- min(booking_date))  as days_between
+from booking_table
+group by user_id;
+
