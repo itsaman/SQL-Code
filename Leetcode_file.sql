@@ -173,3 +173,17 @@ where dk>=3
    left join tree t2
    on t1.id = t2.p_id
    order by t1.id
+
+--2023
+--Managers with at Least 5 Direct Reports
+
+with temp as (
+  select e1.name as emp_name, e2.name as manager_name
+  from Employee e1
+  join Employee e2 on e1.id = e2.managerId
+), temp2 as (
+ select *, dense_rank()over(partition by emp_name order by manager_name) as rn  
+ from temp
+)
+select distinct emp_name as name  from temp2 
+where rn >= 5
