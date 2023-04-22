@@ -176,7 +176,7 @@ where dk>=3
 
 --2023
 --Managers with at Least 5 Direct Reports
-
+-- Aprroach 1
 with temp as (
   select e1.name as emp_name, e2.name as manager_name
   from Employee e1
@@ -187,3 +187,15 @@ with temp as (
 )
 select distinct emp_name as name  from temp2 
 where rn >= 5
+
+-- Aprroach 2
+with temp as (
+  select e1.name as emp_name, e2.name as manager_name
+  from Employee e1
+  join Employee e2 on e1.id = e2.managerId
+), temp2 as (
+select emp_name as name , count(distinct manager_name) as co from temp 
+group by emp_name
+having co>=5
+)
+select name from temp2 
