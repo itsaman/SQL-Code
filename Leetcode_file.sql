@@ -199,3 +199,17 @@ group by emp_name
 having co>=5
 )
 select name from temp2 
+
+
+--Game Play Analysis 4
+With temp as (
+select  player_id, 
+        event_date, 
+        DATEDIFF(event_date, min(event_date)over(partition by player_id)) as date_diff
+from Activity
+), temp2 as (
+  select count(distinct player_id) as co from activity
+)
+select coalesce(round(count(distinct temp.player_id)/ temp2.co,2),0) as fraction
+from temp, temp2
+where temp.date_diff = 1
