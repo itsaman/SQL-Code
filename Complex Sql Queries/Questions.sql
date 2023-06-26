@@ -21,7 +21,7 @@ from Ameriprise_LLC al
 left join temp t on al.teamid = t.teamid;
 
 -- PayPal SQL Interview Problem (Level Hard) 
-with department as (
+With department as (
 select  department_id as department_id, avg(salary) as sal  from emp
 	group by department_id
 ), all_data as (
@@ -31,5 +31,6 @@ where dep.department_id != e.department_id
 select *, avg(salary)over(partition by dep_id) as avg_sal
 from all_data
 )
-select distinct dep_id from final_res
+select dep_id, sal, avg_sal, count(*) as total_emp, sum(salary) from final_res
 where sal<avg_sal
+group by dep_id, sal, avg_sal
