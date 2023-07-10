@@ -185,3 +185,19 @@ select t.date, t2.co::decimal/t.total::decimal
 from total t
 join temp2 t2
 on t.date = t2.date
+
+
+--Monthly Percentage Difference
+with TEMP AS(
+select EXTRACT(YEAR from created_at) as years 
+        ,EXTRACT(MONTH from created_at) as months 
+        , sum(value) as total 
+from sf_transactions 
+group by 
+        EXTRACT(MONTH from created_at)
+       ,EXTRACT(YEAR from created_at) 
+order by months
+)
+select CONCAT(years,'-',months),
+ROUND(((total-lag(total)over(order by months))/total)*100,2) as mom
+from temp
