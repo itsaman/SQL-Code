@@ -34,3 +34,25 @@ from all_data
 select dep_id, sal, avg_sal, count(*) as total_emp, sum(salary) from final_res
 where sal<avg_sal
 group by dep_id, sal, avg_sal
+
+--FAANG Level SQL Question 
+with temp as (
+select empd_id,  swipe,
+case when flag = 'I' then lead(swipe)over(partition by empd_id order by swipe) else NULL end as difftime
+from clocked_hours
+)
+select empd_id, sum(difftime-swipe) as clocked_hours
+from temp 
+where difftime is not null
+group by empd_id;
+
+--2nd way 
+with cte as (
+select *, row_number()over(partition by empd_id, flag) as rn from clocked_hours
+), cte2 as(
+select empd_id,max(swipe) - min(swipe) as diff
+from cte 
+group by empd_id, rn
+	)
+select empd_id, sum(diff) from cte2
+group by empd_id;
