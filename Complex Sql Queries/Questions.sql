@@ -56,3 +56,10 @@ group by empd_id, rn
 	)
 select empd_id, sum(diff) from cte2
 group by empd_id;
+
+
+-- Google for Data Analyst Position
+select  unnest(string_to_array(content, ' ')), count(*)
+from namaste_python
+group by unnest(string_to_array(content, ' '))
+having count(*)>1
