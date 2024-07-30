@@ -140,5 +140,58 @@ percentile_cont(0.5) within group(order by number) over()
 from recursive_cte;
 
 
+-- Q4 Quiet Student 
+
+CREATE OR REPLACE TABLE Student (
+    student_id INT PRIMARY KEY,
+    student_name VARCHAR(255)
+);
+
+-- Create the Exam table
+CREATE OR REPLACE TABLE Exam (
+    exam_id INT,
+    student_id INT,
+    score INT,
+    PRIMARY KEY (exam_id, student_id),
+    FOREIGN KEY (student_id) REFERENCES Student(student_id)
+);
 
 
+-- Insert statements for the Student table
+INSERT INTO Student (student_id, student_name) VALUES (1, 'Daniel');
+INSERT INTO Student (student_id, student_name) VALUES (2, 'Jade');
+INSERT INTO Student (student_id, student_name) VALUES (3, 'Stella');
+INSERT INTO Student (student_id, student_name) VALUES (4, 'Jonathan');
+INSERT INTO Student (student_id, student_name) VALUES (5, 'Will');
+
+-- Insert statements for the Exam table
+INSERT INTO Exam (exam_id, student_id, score) VALUES (10, 1, 70);
+INSERT INTO Exam (exam_id, student_id, score) VALUES (10, 2, 80);
+INSERT INTO Exam (exam_id, student_id, score) VALUES (10, 3, 90);
+INSERT INTO Exam (exam_id, student_id, score) VALUES (20, 1, 80);
+INSERT INTO Exam (exam_id, student_id, score) VALUES (30, 1, 70);
+INSERT INTO Exam (exam_id, student_id, score) VALUES (30, 3, 80);
+INSERT INTO Exam (exam_id, student_id, score) VALUES (30, 4, 90);
+INSERT INTO Exam (exam_id, student_id, score) VALUES (40, 1, 60);
+INSERT INTO Exam (exam_id, student_id, score) VALUES (40, 2, 70);
+INSERT INTO Exam (exam_id, student_id, score) VALUES (40, 4, 80);
+
+
+Select * from student;
+select * from exam;
+
+
+with temp as (
+    select stu.student_name, exm.*,
+    dense_rank()over(partition by exam_id order by score asc) as dk_asc,
+    dense_rank()over(partition by exam_id order by score desc) as dk_desc,
+    from student stu
+    join exam exm
+    on stu.student_id = exm.student_id
+)
+select distinct student_name, student_id 
+from temp where student_id not in 
+(
+    select student_id from temp 
+    where dk_asc in (1,3) and dk_desc in (1,3)
+);
