@@ -19,6 +19,7 @@ INSERT INTO Activity (player_id, device_id, event_date, games_played) VALUES
 (3, 1, '2016-03-02', 0),
 (3, 4, '2018-07-03', 5);
 
+-- Solution
 
 select player_id, device_id,
 dense_rank()over(partition by player_id order by event_date asc) as dk
@@ -60,6 +61,8 @@ INSERT INTO department (employee_id, department_id) VALUES
 Select * from salary;
 select * from department;
 
+-- Solution
+
 with temp as (
     select *,
     avg(amount)over(partition by month(pay_date),department_id) as avg_sal,
@@ -99,6 +102,8 @@ INSERT INTO Employee (Id, Month, Salary) VALUES (3, 3, 60);
 INSERT INTO Employee (Id, Month, Salary) VALUES (1, 4, 60);
 INSERT INTO Employee (Id, Month, Salary) VALUES (3, 4, 70);
 
+-- Solution
+
 with temp as (
     select *,
     dense_rank()over(partition by id order by month desc) as dk
@@ -122,8 +127,17 @@ INSERT INTO Numbers (Number, Frequency) VALUES (1, 1);
 INSERT INTO Numbers (Number, Frequency) VALUES (2, 3);
 INSERT INTO Numbers (Number, Frequency) VALUES (3, 1);
 
+-- Solution
+With RECURSIVE recursive_cte as (
 
-Select * from Numbers;
+    select number, frequency, 1 as cnt from numbers
+    union all
+    select number, frequency, cnt+1 as cnt from recursive_cte
+    where cnt < frequency
+)
+select *,
+percentile_cont(0.5) within group(order by number) over()
+from recursive_cte;
 
 
 
